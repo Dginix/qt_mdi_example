@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QTimer>
 #include "mdichild.h"
+#include "mdichildtype.h"
 
 QT_BEGIN_NAMESPACE
 class QAction;
@@ -29,10 +30,6 @@ private:
     QAction *do_smth_2;
 
     MdiChild *createMdiChild();
-
-
-private slots:
-  //void realtimeDataSlot();
 
 };
 #endif // MAINWINDOW_H

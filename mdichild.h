@@ -53,13 +53,15 @@
 
 #include "qcustomplot.h"
 #include "extendedslider.h"
+#include "mdichildtype.h"
+#include "indicatorwidget.h"
 
 class MdiChild : public QWidget
 {
     Q_OBJECT
 
 public:    
-    explicit MdiChild(QString childName = "default", QWidget *parent = nullptr);
+    explicit MdiChild(MdiChildType signalType = MdiChildType::TriangleSignal, QWidget *parent = nullptr);
     ~MdiChild();
 
     double sin_signal(double x, double ampl, double period);
@@ -70,23 +72,24 @@ private:
     QCustomPlot *customPlot;
     QTimer dataTimer;
     QVBoxLayout *mainLayout;
-    ExtendedSlider *amplitudeExtSlider;
-    ExtendedSlider *periodExtSlider;
+    ExtendedSlider *slider1;
+    ExtendedSlider *slider2;
+    IndicatorWidget *indicator1;
+    MdiChildType mySignalType;
 
 protected:
-    void resizeEvent(QResizeEvent* event);
     double x_data;
     double y_data;
 
-    double amplitude;
-    double period;
+    double param1;
+    double param2;
 
 
 private slots:
     void realtimeDataSlot();
 
-    void getAmplitude(double slot_val);
-    void getPeriod(double slot_val);
+    void getValueExtSlider1(double slot_val);
+    void getValueExtSlider2(double slot_val);
 };
 
 #endif

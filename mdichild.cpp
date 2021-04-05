@@ -51,69 +51,103 @@
 #include <QtWidgets>
 #include "mdichild.h"
 #include <QtDebug>
-#include "extendedslider.h"
 
 MdiChild::~MdiChild()
 {
     delete customPlot;
 }
 
-MdiChild::MdiChild(QString childName, QWidget *parent) : QWidget(parent)
+MdiChild::MdiChild(MdiChildType signalType, QWidget *parent) : QWidget(parent), mySignalType(signalType)
 {
     setAttribute(Qt::WA_DeleteOnClose);
-    this->setWindowTitle(childName);
+
+    switch(mySignalType)
+    {
+        case MdiChildType::TriangleSignal:  this->setWindowTitle("TriangleSignal"); break;
+        case MdiChildType::SinSignal:       this->setWindowTitle("SinSignal"); break;
+        case MdiChildType::RandomSignal:    this->setWindowTitle("RandomSignal"); break;
+        case MdiChildType::OptionSignal:    this->setWindowTitle("OptionSignal"); break;
+        case MdiChildType::MainWindow: break;
+    }
+
     this->setMinimumSize(300, 150);
 
     x_data = 0;
-    amplitude = 1.0;
-    period = 1.0;
+    param1 = 1.0;
+    param2 = 2.0;
 
-    mainLayout = new QVBoxLayout(this);
+    mainLayout = new QVBoxLayout();
     customPlot = new QCustomPlot();
-    amplitudeExtSlider = new ExtendedSlider("amplitude", 0, 5, 1);
-    periodExtSlider = new ExtendedSlider("period", 0, 5, 1);
+
+    if(mySignalType == MdiChildType::RandomSignal)
+    {
+        slider1 = new ExtendedSlider("min", 0, 5, 1);
+        slider2 = new ExtendedSlider("max", 0, 5, 1);
+    }
+    else
+    {
+        slider1 = new ExtendedSlider("amplitude", 0, 5, 1);
+        slider2 = new ExtendedSlider("period", 0, 5, 1);
+    }
+
+    indicator1 = new IndicatorWidget();
 
     mainLayout->addWidget(customPlot);
-    mainLayout->addWidget(amplitudeExtSlider);
-    mainLayout->addWidget(periodExtSlider);
+    mainLayout->addWidget(slider1);
+    mainLayout->addWidget(slider2);
+    mainLayout->addWidget(indicator1);
+
     setLayout(mainLayout);
 
-    customPlot->setObjectName(QString::fromUtf8("bla bla bla"));
+    customPlot->setObjectName(QString::fromUtf8("signal"));
     customPlot->addGraph();
     customPlot->graph(0)->setPen(QPen(Qt::red));
-    customPlot->addGraph();
-    customPlot->graph(1)->setPen(QPen(Qt::green));
     customPlot->show();
 
     customPlot->axisRect()->setupFullAxesBox();
     customPlot->yAxis->setRange(-1.2, 1.2);
 
-    connect(amplitudeExtSlider, SIGNAL(mySignal(double)), this, SLOT(getAmplitude(double)));
-    connect(periodExtSlider, SIGNAL(mySignal(double)), this, SLOT(getPeriod(double)));
+    connect(slider1, SIGNAL(mySignal(double)), this, SLOT(getValueExtSlider1(double)));
+    connect(slider2, SIGNAL(mySignal(double)), this, SLOT(getValueExtSlider2(double)));
 
     // setup a timer that repeatedly calls MainWindow::realtimeDataSlot:
     connect(&dataTimer, SIGNAL(timeout()), this, SLOT(realtimeDataSlot()));
-    dataTimer.start(50); // Interval 0 means to refresh as fast as possible
+    dataTimer.start(1000); // Interval 0 means to refresh as fast as possible
                           // in msec
-}
-
-void MdiChild::resizeEvent(QResizeEvent* event)
-{
-    //customPlot->resize(mainLayout->contentsRect().width(), height());
 }
 
 void MdiChild::realtimeDataSlot()
 {
+    static int abc = 1;
+    if(abc > 0)
+    {
+        qDebug()<<"On";
+        indicator1->setState(IndicatorWidget::IndicatorState::ON);
+        abc = 0;
+    }
+    else
+    {
+        qDebug()<<"Off";
+        indicator1->setState(IndicatorWidget::IndicatorState::OFF);
+        abc = 1;
+    }
+
+
     // TODO depends from timer it mast be equal to 1 sec
     double step = 0.005;
     // TODO solve overflow problem
     x_data += step;
-    y_data = triangle_signal(x_data, amplitude, period);
-    //y_data = sin_signal(x_data, 2.0, 1.0);
+
+    switch(mySignalType)
+    {
+        case MdiChildType::TriangleSignal:  y_data = triangle_signal(x_data, param1, param2); break;
+        case MdiChildType::SinSignal:       y_data = sin_signal(x_data, param1, param2); break;
+        case MdiChildType::RandomSignal:    y_data = random_signal(param1, param2); break;
+        case MdiChildType::OptionSignal:    y_data = sin_signal(x_data, param1, param2); break;
+        case MdiChildType::MainWindow: break;
+    }
 
     customPlot->graph(0)->addData(x_data, y_data);
-    customPlot->graph(1)->addData(x_data, random_signal(x_data, amplitude, period));
-
 
     customPlot->xAxis->setRange(x_data, step * 40, Qt::AlignRight);
     customPlot->yAxis->setRange(-1, 10, Qt::AlignBottom);
@@ -138,12 +172,12 @@ double MdiChild::random_signal(double min, double max)
     return min + f * (max - min);
 }
 
-void MdiChild::getAmplitude(double slot_val)
+void MdiChild::getValueExtSlider1(double slot_val)
 {
-    amplitude = slot_val;
+    param1 = slot_val;
 }
 
-void MdiChild::getPeriod(double slot_val)
+void MdiChild::getValueExtSlider2(double slot_val)
 {
-    period = slot_val;
+    param2 = slot_val;
 }

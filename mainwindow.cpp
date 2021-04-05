@@ -1,5 +1,5 @@
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
+#include "mainwindow.h"
 #include "qcustomplot.h"
 #include <QtDebug>
 
@@ -10,7 +10,12 @@ MainWindow::MainWindow()
     mdiArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     setCentralWidget(mdiArea);
 
-    MdiChild *child = createMdiChild();
+    MdiChild *child = new MdiChild(MdiChildType::TriangleSignal);
+    mdiArea->addSubWindow(child);
+
+//    MdiChild *child2 = new MdiChild(MdiChildType::SinSignal);
+//    mdiArea->addSubWindow(child2);
+
 
     do_smth_1 = new QAction(tr("&do_smth_1"), this);
     do_smth_1->setShortcuts(QKeySequence::New);
