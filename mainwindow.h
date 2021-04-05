@@ -3,9 +3,13 @@
 
 #include <QMainWindow>
 #include <QTimer>
+#include "mdichild.h"
 
 QT_BEGIN_NAMESPACE
-namespace Ui { class MainWindow; }
+class QAction;
+class QMenu;
+class QMdiArea;
+class QMdiSubWindow;
 QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow
@@ -13,14 +17,21 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
+    MainWindow();
     ~MainWindow();
     QTimer dataTimer;
 
 private:
-    Ui::MainWindow *ui;
+    QMdiArea *mdiArea;
+
+    QMenu *windowMenu;
+    QAction *do_smth_1;
+    QAction *do_smth_2;
+
+    MdiChild *createMdiChild();
+
 
 private slots:
-  void realtimeDataSlot();
+  //void realtimeDataSlot();
 };
 #endif // MAINWINDOW_H
