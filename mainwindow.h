@@ -33,5 +33,6 @@ private:
 
 private slots:
   //void realtimeDataSlot();
+
 };
 #endif // MAINWINDOW_H

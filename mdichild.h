@@ -52,13 +52,14 @@
 #define MDICHILD_H
 
 #include "qcustomplot.h"
+#include "extendedslider.h"
 
 class MdiChild : public QWidget
 {
     Q_OBJECT
 
-public:
-    MdiChild();
+public:    
+    explicit MdiChild(QString childName = "default", QWidget *parent = nullptr);
     ~MdiChild();
 
     double sin_signal(double x, double ampl, double period);
@@ -67,17 +68,22 @@ public:
 private:
     QCustomPlot *customPlot;
     QTimer dataTimer;
+    QVBoxLayout *mainLayout;
+    ExtendedSlider *amplitudeExtSlider;
+    ExtendedSlider *periodExtSlider;
 
 protected:
     void resizeEvent(QResizeEvent* event);
     double x_data;
     double y_data;
+    double amplitude;
+    double period;
 
 
 private slots:
     void realtimeDataSlot();
-
-
+    void getAmplitude(double slot_val);
+    void getPeriod(double slot_val);
 };
 
 #endif

@@ -51,20 +51,33 @@
 #include <QtWidgets>
 #include "mdichild.h"
 #include <QtDebug>
+#include "extendedslider.h"
 
 MdiChild::~MdiChild()
 {
     delete customPlot;
 }
 
-MdiChild::MdiChild()
+MdiChild::MdiChild(QString childName, QWidget *parent) : QWidget(parent)
 {
-    x_data = 0;
-
     setAttribute(Qt::WA_DeleteOnClose);
+    this->setWindowTitle(childName);
     this->setMinimumSize(300, 150);
 
-    customPlot = new QCustomPlot(this);
+    x_data = 0;
+    amplitude = 1.0;
+    period = 1.0;
+
+    mainLayout = new QVBoxLayout(this);
+    customPlot = new QCustomPlot();
+    amplitudeExtSlider = new ExtendedSlider("amplitude", 0, 5, 1);
+    periodExtSlider = new ExtendedSlider("period", 0, 5, 1);
+
+    mainLayout->addWidget(customPlot);
+    mainLayout->addWidget(amplitudeExtSlider);
+    mainLayout->addWidget(periodExtSlider);
+    setLayout(mainLayout);
+
     customPlot->setObjectName(QString::fromUtf8("bla bla bla"));
     customPlot->addGraph();
     customPlot->graph(0)->setPen(QPen(Qt::red));
@@ -75,29 +88,31 @@ MdiChild::MdiChild()
     customPlot->axisRect()->setupFullAxesBox();
     customPlot->yAxis->setRange(-1.2, 1.2);
 
-    //connect(customPlot->xAxis, SIGNAL(rangeChanged(QCPRange)), customPlot->xAxis2, SLOT(setRange(QCPRange)));
+    connect(amplitudeExtSlider, SIGNAL(mySignal(double)), this, SLOT(getAmplitude(double)));
+    connect(periodExtSlider, SIGNAL(mySignal(double)), this, SLOT(getPeriod(double)));
 
     // setup a timer that repeatedly calls MainWindow::realtimeDataSlot:
     connect(&dataTimer, SIGNAL(timeout()), this, SLOT(realtimeDataSlot()));
-    dataTimer.start(100); // Interval 0 means to refresh as fast as possible
+    dataTimer.start(50); // Interval 0 means to refresh as fast as possible
                           // in msec
 }
 
 void MdiChild::resizeEvent(QResizeEvent* event)
 {
-    customPlot->resize(width(), height());
+    //customPlot->resize(mainLayout->contentsRect().width(), height());
 }
 
 void MdiChild::realtimeDataSlot()
 {
     // TODO depends from timer it mast be equal to 1 sec
-    double step = 0.1;
+    double step = 0.005;
+    // TODO solve overflow problem
     x_data += step;
-    y_data = triangle_signal(x_data, 1.0, 2.0);
+    y_data = triangle_signal(x_data, amplitude, period);
     //y_data = sin_signal(x_data, 2.0, 1.0);
 
     customPlot->graph(0)->addData(x_data, y_data);
-    qDebug()<<x_data<<y_data;
+//    qDebug()<<x_data<<y_data;
 
     //customPlot->xAxis->setRange(x, 8, Qt::AlignRight);
     customPlot->xAxis->setRange(x_data, step * 40, Qt::AlignRight);
@@ -108,7 +123,6 @@ void MdiChild::realtimeDataSlot()
 
 double MdiChild::sin_signal(double x, double ampl, double period)
 {
-    // TODO solve overflow problem
     return ampl * sin(2 * M_PI * x * 1.0/period);
 }
 
@@ -116,4 +130,14 @@ double MdiChild::triangle_signal(double x, double ampl, double period)
 {
     //return 1.0 - fabs(fmod(x, 2.0) - 1.0);
     return ampl/(M_PI) * asin(cos(2 * M_PI * x * 1.0/period));
+}
+
+void MdiChild::getAmplitude(double slot_val)
+{
+    amplitude = slot_val;
+}
+
+void MdiChild::getPeriod(double slot_val)
+{
+    period = slot_val;
 }

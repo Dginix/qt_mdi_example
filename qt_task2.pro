@@ -12,12 +12,14 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     qcustomplot.cpp \
-    mdichild.cpp
+    mdichild.cpp \
+    extendedslider.cpp
 
 HEADERS += \
     mainwindow.h \
     qcustomplot.h \
-    mdichild.h
+    mdichild.h \
+    extendedslider.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
