@@ -112,9 +112,9 @@ void MdiChild::realtimeDataSlot()
     //y_data = sin_signal(x_data, 2.0, 1.0);
 
     customPlot->graph(0)->addData(x_data, y_data);
-//    qDebug()<<x_data<<y_data;
+    customPlot->graph(1)->addData(x_data, random_signal(x_data, amplitude, period));
 
-    //customPlot->xAxis->setRange(x, 8, Qt::AlignRight);
+
     customPlot->xAxis->setRange(x_data, step * 40, Qt::AlignRight);
     customPlot->yAxis->setRange(-1, 10, Qt::AlignBottom);
 
@@ -130,6 +130,12 @@ double MdiChild::triangle_signal(double x, double ampl, double period)
 {
     //return 1.0 - fabs(fmod(x, 2.0) - 1.0);
     return ampl/(M_PI) * asin(cos(2 * M_PI * x * 1.0/period));
+}
+
+double MdiChild::random_signal(double min, double max)
+{
+    double f = (double)rand() / RAND_MAX;
+    return min + f * (max - min);
 }
 
 void MdiChild::getAmplitude(double slot_val)

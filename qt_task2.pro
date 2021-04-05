@@ -17,6 +17,7 @@ SOURCES += \
 
 HEADERS += \
     mainwindow.h \
+    mdichildtype.h \
     qcustomplot.h \
     mdichild.h \
     extendedslider.h

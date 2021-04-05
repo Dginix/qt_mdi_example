@@ -64,6 +64,7 @@ public:
 
     double sin_signal(double x, double ampl, double period);
     double triangle_signal(double x, double ampl, double period);
+    double random_signal(double min, double max);
 
 private:
     QCustomPlot *customPlot;
@@ -76,12 +77,14 @@ protected:
     void resizeEvent(QResizeEvent* event);
     double x_data;
     double y_data;
+
     double amplitude;
     double period;
 
 
 private slots:
     void realtimeDataSlot();
+
     void getAmplitude(double slot_val);
     void getPeriod(double slot_val);
 };
