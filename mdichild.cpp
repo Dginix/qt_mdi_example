@@ -76,8 +76,8 @@ MdiChild::MdiChild(MdiChildType signalType, QWidget *parent) : QWidget(parent), 
     param1 = 1.0;
     param2 = 2.0;
 
-    mainLayout = new QVBoxLayout();
-    customPlot = new QCustomPlot();
+    mainLayout = new QVBoxLayout(this);
+    customPlot = new QCustomPlot(this);
 
     if(mySignalType == MdiChildType::RandomSignal)
     {
@@ -90,13 +90,16 @@ MdiChild::MdiChild(MdiChildType signalType, QWidget *parent) : QWidget(parent), 
         slider2 = new ExtendedSlider("period", 0, 5, 1);
     }
 
-    indicator1 = new IndicatorWidget();
+    indicator1 = new IndicatorWidget("Warning!", this);
+
+    label = new QLabel(this);
+    label->setText("bALBALB");
 
     mainLayout->addWidget(customPlot);
     mainLayout->addWidget(slider1);
     mainLayout->addWidget(slider2);
     mainLayout->addWidget(indicator1);
-
+    mainLayout->addWidget(label);
     setLayout(mainLayout);
 
     customPlot->setObjectName(QString::fromUtf8("signal"));
@@ -111,28 +114,20 @@ MdiChild::MdiChild(MdiChildType signalType, QWidget *parent) : QWidget(parent), 
     connect(slider2, SIGNAL(mySignal(double)), this, SLOT(getValueExtSlider2(double)));
 
     // setup a timer that repeatedly calls MainWindow::realtimeDataSlot:
-    connect(&dataTimer, SIGNAL(timeout()), this, SLOT(realtimeDataSlot()));
-    dataTimer.start(1000); // Interval 0 means to refresh as fast as possible
+    dataTimer = new QTimer(this);
+    dataTimer->setTimerType(Qt::PreciseTimer);
+    connect(dataTimer, SIGNAL(timeout()), this, SLOT(realtimeDataSlot()));
+    dataTimer->start(50); // Interval 0 means to refresh as fast as possible
                           // in msec
+
+    DataThread *workThread = new DataThread();
+    connect(workThread, SIGNAL(valueChanged(double,double)), this, SLOT(onDataChanged(double,double)));
+    connect(workThread, SIGNAL(finished()), workThread, SLOT(deleteLater()));
+    workThread->start();
 }
 
 void MdiChild::realtimeDataSlot()
 {
-    static int abc = 1;
-    if(abc > 0)
-    {
-        qDebug()<<"On";
-        indicator1->setState(IndicatorWidget::IndicatorState::ON);
-        abc = 0;
-    }
-    else
-    {
-        qDebug()<<"Off";
-        indicator1->setState(IndicatorWidget::IndicatorState::OFF);
-        abc = 1;
-    }
-
-
     // TODO depends from timer it mast be equal to 1 sec
     double step = 0.005;
     // TODO solve overflow problem
@@ -180,4 +175,25 @@ void MdiChild::getValueExtSlider1(double slot_val)
 void MdiChild::getValueExtSlider2(double slot_val)
 {
     param2 = slot_val;
+}
+
+void MdiChild::onDataChanged(double x, double y)
+{
+    static int abc = 0;
+
+    if(abc > 0)
+    {
+        label->setText(QString::number(x) + " " + QString::number(y));
+        label->setStyleSheet("background-color: red");
+        this->update();
+        abc = 0;
+    }
+    else
+    {
+        label->setText(QString::number(x) + " " + QString::number(y));
+        label->setStyleSheet("background-color: green");
+        this->update();
+        abc = 1;
+    }
+
 }

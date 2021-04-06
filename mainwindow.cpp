@@ -2,6 +2,7 @@
 #include "mainwindow.h"
 #include "qcustomplot.h"
 #include <QtDebug>
+#include <QThread>
 
 MainWindow::MainWindow()
     : mdiArea(new QMdiArea)
@@ -13,8 +14,8 @@ MainWindow::MainWindow()
     MdiChild *child = new MdiChild(MdiChildType::TriangleSignal);
     mdiArea->addSubWindow(child);
 
-//    MdiChild *child2 = new MdiChild(MdiChildType::SinSignal);
-//    mdiArea->addSubWindow(child2);
+    MdiChild *child2 = new MdiChild(MdiChildType::SinSignal);
+    mdiArea->addSubWindow(child2);
 
 
     do_smth_1 = new QAction(tr("&do_smth_1"), this);

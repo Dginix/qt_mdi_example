@@ -55,6 +55,8 @@
 #include "extendedslider.h"
 #include "mdichildtype.h"
 #include "indicatorwidget.h"
+#include "datathread.h"
+#include <QLabel>
 
 class MdiChild : public QWidget
 {
@@ -70,12 +72,14 @@ public:
 
 private:
     QCustomPlot *customPlot;
-    QTimer dataTimer;
+    QTimer *dataTimer;
     QVBoxLayout *mainLayout;
     ExtendedSlider *slider1;
     ExtendedSlider *slider2;
     IndicatorWidget *indicator1;
     MdiChildType mySignalType;
+    QLabel *label;
+
 
 protected:
     double x_data;
@@ -85,11 +89,16 @@ protected:
     double param2;
 
 
+public slots:
+    void onDataChanged(double,double);
+
 private slots:
     void realtimeDataSlot();
 
     void getValueExtSlider1(double slot_val);
     void getValueExtSlider2(double slot_val);
+
+
 };
 
 #endif

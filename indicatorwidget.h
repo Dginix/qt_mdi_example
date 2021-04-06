@@ -5,6 +5,7 @@
 #include <QPainter>
 #include <QLabel>
 #include <QBoxLayout>
+#include <QDebug>
 
 class IndicatorWidget : public QWidget
 {
@@ -18,16 +19,17 @@ public:
     };
 
     explicit IndicatorWidget(QString setWarningMessage = "Warning!", QWidget *parent = nullptr);
-    void setState(IndicatorState setTo);
+    void setState(IndicatorWidget::IndicatorState setTo, QString from);
+    QLabel *label;
+
+public slots:
 
 private:
     IndicatorState myState;
-    QString *messageToShow;
     QString warningMessage;
     QString normalMessage;
 
 protected:
-    void paintEvent(QPaintEvent *) override;
 
 
 signals:

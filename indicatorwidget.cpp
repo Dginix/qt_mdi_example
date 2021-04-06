@@ -4,39 +4,36 @@ IndicatorWidget::IndicatorWidget(QString setWarningMessage, QWidget *parent) : Q
 {
     myState = IndicatorState::OFF;
     normalMessage = "Normal";
+    label = new QLabel(this);
+    label->setText(normalMessage);
+    label->setAlignment(Qt::AlignCenter);
 
-    setMinimumWidth(300);
-    setMinimumHeight(60);
+    setMinimumHeight(20);
+    setMinimumWidth(100);
 
-    setMaximumHeight(300);
-    setMaximumWidth(60);
-    messageToShow = &warningMessage;
+    setMaximumHeight(20);
+    setMaximumWidth(100);
 }
 
-void IndicatorWidget::paintEvent(QPaintEvent *)
-{
-    QPainter painter(this);
-    painter.setRenderHint(QPainter::Antialiasing);
-    if (myState == IndicatorState::OFF) painter.setBrush(Qt::green);
-    if (myState == IndicatorState::ON) painter.setBrush(Qt::red);
-    painter.drawEllipse(0, 0, 20, 20);
-    painter.drawText(40, 15, *messageToShow);
-}
-
-void IndicatorWidget::setState(IndicatorState setTo)
+void IndicatorWidget::setState(IndicatorState setTo, QString from)
 {
     switch(setTo)
     {
         case IndicatorState::OFF:
+            qDebug()<<myState<<" "<<from;
             myState = IndicatorState::OFF;
-            messageToShow = &warningMessage;
+            label -> setText(warningMessage);
+            label->setStyleSheet("background-color: green");
             break;
 
         case IndicatorState::ON:
+            qDebug()<<myState<<" "<<from;
             myState = IndicatorState::ON;
-            messageToShow = &normalMessage;
+            label -> setText(normalMessage);
+            label->setStyleSheet("background-color: red");
             break;
     }
-    this->repaint();
+    this->update();
+    this->show();
 }
 
