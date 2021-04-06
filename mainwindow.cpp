@@ -46,17 +46,37 @@ void MainWindow::createMenu()
     setSignal->addAction("Triangle signal", mainMdiChild, SLOT(setSwitchTriangle()));
     setSignal->addAction("Sine signal", mainMdiChild, SLOT(setSwitchSin()));
     setSignal->addAction("Random signal", mainMdiChild, SLOT(setSwitchRandom()));
-    setSignal->addAction("OPtion signal", mainMdiChild, SLOT(setSwitchOption()));
+    setSignal->addAction("Option signal", mainMdiChild, SLOT(setSwitchOption()));
 
     setActiveWindow = new QMenu("Activate window");
+
+    QAction *triangle_activ = new QAction("Triangle signal", this);
+    setActiveWindow->addAction(triangle_activ);
+    connect(triangle_activ, &QAction::triggered,
+            [=]() { this->myActivateWindow(MdiChildType::TriangleSignal); });
+
+    QAction *sin_activ = new QAction("Sine signal", this);
+    setActiveWindow->addAction(sin_activ);
+    connect(sin_activ, &QAction::triggered,
+            [=]() { this->myActivateWindow(MdiChildType::SinSignal); });
+
+    QAction *rand_activ = new QAction("Random signal", this);
+    setActiveWindow->addAction(rand_activ);
+    connect(rand_activ, &QAction::triggered,
+            [=]() { this->myActivateWindow(MdiChildType::RandomSignal); });
+
+    QAction *optopn_activ = new QAction("Option signal", this);
+    setActiveWindow->addAction(optopn_activ);
+    connect(optopn_activ, &QAction::triggered,
+            [=]() { this->myActivateWindow(MdiChildType::OptionSignal); });
 
     MainMenu->addMenu(setActiveWindow);
     MainMenu->addMenu(setSignal);
 }
 
-void MainWindow::onWarningSignal(MdiChildType fromChild)
+void MainWindow::myActivateWindow(MdiChildType childType)
 {
-    switch(fromChild)
+    switch(childType)
     {
         case MdiChildType::SinSignal:   // 1
             mdiArea->setActiveSubWindow(SinSignal);
@@ -80,8 +100,43 @@ void MainWindow::onWarningSignal(MdiChildType fromChild)
     }
 }
 
-void MainWindow::testSlot()
+void MainWindow::onWarningSignal(MdiChildType slotChildType, bool warnState)
 {
-    qDebug()<<"bla";
+    static bool blockWarn1 = false;
+    static bool blockWarn2 = false;
+    static bool blockWarn3 = false;
+    static bool blockWarn4 = false;
+
+    if(slotChildType == MdiChildType::SinSignal && warnState) blockWarn1 = true;
+    if(slotChildType == MdiChildType::SinSignal && !warnState) blockWarn1 = false;
+
+    if(slotChildType == MdiChildType::TriangleSignal && warnState) blockWarn2 = true;
+    if(slotChildType == MdiChildType::TriangleSignal && !warnState) blockWarn2 = false;
+
+    if(slotChildType == MdiChildType::RandomSignal && warnState) blockWarn3 = true;
+    if(slotChildType == MdiChildType::RandomSignal && !warnState) blockWarn3 = false;
+
+    if(slotChildType == MdiChildType::OptionSignal && warnState) blockWarn4 = true;
+    if(slotChildType == MdiChildType::OptionSignal && !warnState) blockWarn4 = false;
+
+    if(blockWarn1)
+    {
+        myActivateWindow(MdiChildType::SinSignal);
+    }
+
+    if(blockWarn2 && !blockWarn1)
+    {
+        myActivateWindow(MdiChildType::TriangleSignal);
+    }
+
+    if(blockWarn3 && !blockWarn1 && !blockWarn2)
+    {
+        myActivateWindow(MdiChildType::RandomSignal);
+    }
+
+    if(blockWarn4 && !blockWarn1 && !blockWarn2 && !blockWarn3)
+    {
+        myActivateWindow(MdiChildType::OptionSignal);
+    }
 }
 

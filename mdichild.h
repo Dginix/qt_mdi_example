@@ -119,8 +119,7 @@ private slots:
 signals:
     void changeParam1(double);
     void changeParam2(double);
-    void warningSignal(MdiChildType childType);
-    void testSignal();
+    void warningSignal(MdiChildType, bool);
 };
 
 #endif

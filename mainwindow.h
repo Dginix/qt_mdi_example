@@ -6,6 +6,7 @@
 #include "mdichild.h"
 #include "mdichildtype.h"
 #include "mainmdichild.h"
+#include <functional>
 
 QT_BEGIN_NAMESPACE
 class QAction;
@@ -19,6 +20,8 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
+
+
     MainWindow();
     ~MainWindow();
     QTimer dataTimer;
@@ -41,10 +44,9 @@ private:
 
     void createMenu();
     void createMdi();
+    void myActivateWindow(MdiChildType childType);
 
 public slots:
-    void onWarningSignal(MdiChildType fromChild);
-    void testSlot();
-
+    void onWarningSignal(MdiChildType, bool);
 };
 #endif // MAINWINDOW_H

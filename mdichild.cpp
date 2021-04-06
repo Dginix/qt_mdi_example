@@ -223,12 +223,12 @@ void MdiChild::warnTaskTriangle(void)
     if(y_data > warnVal1)
     {
         indicator1->setState(IndicatorWidget::IndicatorState::ON);
-        emit warningSignal(mySignalType);
-        emit testSignal();
+        emit warningSignal(mySignalType, true);
     }
     else
     {
         indicator1->setState(IndicatorWidget::IndicatorState::OFF);
+        emit warningSignal(mySignalType, false);
     }
 }
 
@@ -240,12 +240,12 @@ void MdiChild::warnTaskSin(void)
     if(y_data < warnVal1)
     {
         indicator1->setState(IndicatorWidget::IndicatorState::ON);
-        emit warningSignal(mySignalType);
-        emit testSignal();
+        emit warningSignal(mySignalType, true);
     }
     else
     {
         indicator1->setState(IndicatorWidget::IndicatorState::OFF);
+        emit warningSignal(mySignalType, false);
     }
 }
 
@@ -263,12 +263,12 @@ void MdiChild::warnTaskRandom(void)
     {
         wasHigh = true;
         indicator1->setState(IndicatorWidget::IndicatorState::ON);
-        emit warningSignal(mySignalType);
-        emit testSignal();
+        emit warningSignal(mySignalType, true);
     }
     else if(wasHigh && y_data < warnVal2)
     {
         wasHigh = false;
         indicator1->setState(IndicatorWidget::IndicatorState::OFF);
+        emit warningSignal(mySignalType, false);
     }
 }
