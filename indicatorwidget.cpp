@@ -3,9 +3,12 @@
 IndicatorWidget::IndicatorWidget(QString setWarningMessage, QWidget *parent) : QWidget(parent), warningMessage(setWarningMessage)
 {
     myState = IndicatorState::OFF;
+
     normalMessage = "Normal";
+
     label = new QLabel(this);
     label->setText(normalMessage);
+    label->setStyleSheet("background-color: green");
     label->setAlignment(Qt::AlignCenter);
 
     setMinimumHeight(20);
@@ -15,7 +18,7 @@ IndicatorWidget::IndicatorWidget(QString setWarningMessage, QWidget *parent) : Q
     setMaximumWidth(100);
 }
 
-void IndicatorWidget::setState(IndicatorState setTo, QString from)
+void IndicatorWidget::setState(IndicatorState setTo)
 {
     switch(setTo)
     {

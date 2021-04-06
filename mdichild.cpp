@@ -59,7 +59,14 @@ MdiChild::~MdiChild()
 
 MdiChild::MdiChild(MdiChildType signalType, QWidget *parent) : QWidget(parent), mySignalType(signalType)
 {
+    x_data = 0;
+    y_data = 0;
+
+    param1 = 1.0;
+    param2 = 1.0;
     setAttribute(Qt::WA_DeleteOnClose);
+    this->setMinimumSize(300, 150);
+
     mainLayout = new QVBoxLayout(this);
     customPlot = new QCustomPlot(this);
 
@@ -68,30 +75,60 @@ MdiChild::MdiChild(MdiChildType signalType, QWidget *parent) : QWidget(parent), 
     customPlot->graph(0)->setPen(QPen(Qt::black));
 
     customPlot->axisRect()->setupFullAxesBox();
-    customPlot->yAxis->setRange(-1.2, 1.2);
     customPlot->show();
-
-    line_item1 = new QCPItemLine(customPlot);
 
     switch(mySignalType)
     {
         case MdiChildType::TriangleSignal:
             //if low
             this->setWindowTitle("TriangleSignal");
-            warnSlider1 = new ExtendedSlider("low tresh", 0, 5, 0);
+
+            warnSlider1 = new ExtendedSlider("low tresh", -5, 5, 0);
             mainLayout->addWidget(warnSlider1);
             connect(warnSlider1, SIGNAL(mySignal(double)), this, SLOT(getValueWarnSlider1(double)));
+
+            indicator1 = new IndicatorWidget("Too Low!", this);
+            mainLayout->addWidget(indicator1);
+
+            line_item1 = new QCPItemLine(customPlot);
+            line_item1->setPen(QPen(Qt::red));
             break;
 
         case MdiChildType::SinSignal:
             this->setWindowTitle("SinSignal");
-            warnSlider1 = new ExtendedSlider("high tresh", 0, 5, 0);
+
+            warnSlider1 = new ExtendedSlider("high tresh", -5, 5, 0);
             mainLayout->addWidget(warnSlider1);
             connect(warnSlider1, SIGNAL(mySignal(double)), this, SLOT(getValueWarnSlider1(double)));
+
+            indicator1 = new IndicatorWidget("Too high!", this);
+            mainLayout->addWidget(indicator1);
+
+            line_item1 = new QCPItemLine(customPlot);
+            line_item1->setPen(QPen(Qt::red));
             break;
 
         case MdiChildType::RandomSignal:
             this->setWindowTitle("RandomSignal");
+
+            warnSlider1 = new ExtendedSlider("high tresh", -5, 5, 4);
+            warnVal1 = 4;
+            mainLayout->addWidget(warnSlider1);
+            connect(warnSlider1, SIGNAL(mySignal(double)), this, SLOT(getValueWarnSlider1(double)));
+
+            warnSlider2 = new ExtendedSlider("low tresh", -5, 5, -4);
+            warnVal2 = -4;
+            mainLayout->addWidget(warnSlider2);
+            connect(warnSlider2, SIGNAL(mySignal(double)), this, SLOT(getValueWarnSlider2(double)));
+
+            indicator1 = new IndicatorWidget("Warning!", this);
+            mainLayout->addWidget(indicator1);
+
+            line_item1 = new QCPItemLine(customPlot);
+            line_item1->setPen(QPen(Qt::red));
+
+            line_item2 = new QCPItemLine(customPlot);
+            line_item2->setPen(QPen(Qt::green));
             break;
 
         case MdiChildType::OptionSignal:
@@ -100,13 +137,6 @@ MdiChild::MdiChild(MdiChildType signalType, QWidget *parent) : QWidget(parent), 
 
         case MdiChildType::MainWindow: break;
     }
-
-    this->setMinimumSize(300, 150);
-
-    x_data = 0;
-    param1 = 1.0;
-    param2 = 1.0;
-
 
     if(mySignalType == MdiChildType::RandomSignal)
     {
@@ -119,12 +149,10 @@ MdiChild::MdiChild(MdiChildType signalType, QWidget *parent) : QWidget(parent), 
         slider2 = new ExtendedSlider("period", 0, 5, 1);
     }
 
-    indicator1 = new IndicatorWidget("Warning!", this);
 
     mainLayout->addWidget(customPlot);
     mainLayout->addWidget(slider1);
     mainLayout->addWidget(slider2);
-    mainLayout->addWidget(indicator1);
 
     setLayout(mainLayout);
 
@@ -161,10 +189,10 @@ void MdiChild::getValueWarnSlider2(double slot_val)
     warnVal2 = slot_val;
 }
 
+
+
 void MdiChild::onDataChanged(double x, double y)
 {
-    static double last_x = 0;
-
     x_data = x;
     y_data = y;
 
@@ -172,19 +200,66 @@ void MdiChild::onDataChanged(double x, double y)
     customPlot->xAxis->setRange(x, 10, Qt::AlignRight);
     customPlot->yAxis->setRange(-1, 10, Qt::AlignBottom);
 
-    line_item1->setPen(QPen(Qt::red));
-
-    line_item1->start->setCoords(x - 11, warnVal1);
-    line_item1->end->setCoords(x + 11, warnVal1);
-
-    customPlot->replot();
-
-    if(y > warnVal1)
+    // here tasks for indicator
+    switch(mySignalType)
     {
-        indicator1->setState(IndicatorWidget::IndicatorState::ON, windowTitle());
+        case MdiChildType::TriangleSignal:  warnTaskTriangle(); break;
+        case MdiChildType::SinSignal:       warnTaskSin(); break;
+        case MdiChildType::RandomSignal:    warnTaskRandom(); break;
+        case MdiChildType::OptionSignal:    break;
+        case MdiChildType::MainWindow: break;
+    }
+    customPlot->replot();
+}
+
+void MdiChild::warnTaskTriangle(void)
+{
+    line_item1->start->setCoords(x_data - 11, warnVal1);
+    line_item1->end->setCoords(x_data + 11, warnVal1);
+
+    if(y_data > warnVal1)
+    {
+        indicator1->setState(IndicatorWidget::IndicatorState::ON);
     }
     else
     {
-        indicator1->setState(IndicatorWidget::IndicatorState::OFF, windowTitle());
+        indicator1->setState(IndicatorWidget::IndicatorState::OFF);
+    }
+}
+
+void MdiChild::warnTaskSin(void)
+{
+    line_item1->start->setCoords(x_data - 11, warnVal1);
+    line_item1->end->setCoords(x_data + 11, warnVal1);
+
+    if(y_data < warnVal1)
+    {
+        indicator1->setState(IndicatorWidget::IndicatorState::ON);
+    }
+    else
+    {
+        indicator1->setState(IndicatorWidget::IndicatorState::OFF);
+    }
+}
+
+void MdiChild::warnTaskRandom(void)
+{
+    static bool wasHigh = false;
+
+    line_item1->start->setCoords(x_data - 11, warnVal1);
+    line_item1->end->setCoords(x_data + 11, warnVal1);
+
+    line_item2->start->setCoords(x_data - 11, warnVal2);
+    line_item2->end->setCoords(x_data + 11, warnVal2);
+
+    if(y_data > warnVal1)
+    {
+        wasHigh = true;
+        indicator1->setState(IndicatorWidget::IndicatorState::ON);
+    }
+    else if(wasHigh && y_data < warnVal2)
+    {
+        wasHigh = false;
+        indicator1->setState(IndicatorWidget::IndicatorState::OFF);
     }
 }

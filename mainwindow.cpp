@@ -17,6 +17,8 @@ MainWindow::MainWindow()
     MdiChild *child2 = new MdiChild(MdiChildType::TriangleSignal);
     mdiArea->addSubWindow(child2);
 
+    MdiChild *child3 = new MdiChild(MdiChildType::RandomSignal);
+    mdiArea->addSubWindow(child3);
 
     do_smth_1 = new QAction(tr("&do_smth_1"), this);
     do_smth_1->setShortcuts(QKeySequence::New);

@@ -5,6 +5,9 @@
 ExtendedSlider::ExtendedSlider(QString label_name, double def_min, double def_max,
                                double def_val, QWidget *parent) : QWidget(parent)
 {
+    sliderCoeff = 1000;
+    extSliderStep = (max - min)/100;
+
     min = def_min;
     max = def_max;
     value = def_val;
@@ -14,13 +17,14 @@ ExtendedSlider::ExtendedSlider(QString label_name, double def_min, double def_ma
     label->setAlignment(Qt::AlignCenter);
 
     slider = new QSlider(Qt::Horizontal);
-    slider->setMinimum(0);
-    slider->setMaximum(1000);
+    slider->setMinimum(min * sliderCoeff);
+    slider->setMaximum(max * sliderCoeff);
+    slider->setSingleStep(extSliderStep * sliderCoeff);
 
     spinBox = new QDoubleSpinBox;
     spinBox->setMinimum(min);
     spinBox->setMaximum(max);
-    spinBox->setSingleStep((fabs(max) - fabs(min))/100);
+    spinBox->setSingleStep(extSliderStep);
 
     spinBox->setValue(value);
     updateValueFromSpinBox();
@@ -41,7 +45,7 @@ ExtendedSlider::ExtendedSlider(QString label_name, double def_min, double def_ma
 
 void ExtendedSlider::updateValueFromSlider()
 {
-    value = (double)slider->value()/(slider->maximum()-slider->minimum())*(max-min)+min;
+    value = (double)slider->value() / sliderCoeff;
     spinBox->setValue(value);
     emit mySignal(value);
 }
@@ -49,7 +53,7 @@ void ExtendedSlider::updateValueFromSlider()
 void ExtendedSlider::updateValueFromSpinBox()
 {
     value = spinBox->value();
-    slider->setValue(value/(max-min)*(slider->maximum()-slider->minimum())+slider->minimum());
+    slider->setValue(value * sliderCoeff);
     emit mySignal(value);
 }
 

@@ -17,7 +17,8 @@ public:
     QSlider *slider;
     QDoubleSpinBox *spinBox;
     QLabel *label;
-    double min, max, value;
+    double min, max, value, extSliderStep;
+    int sliderCoeff;
 
 signals:
     void mySignal(double sign_val);

@@ -19,7 +19,7 @@ public:
     };
 
     explicit IndicatorWidget(QString setWarningMessage = "Warning!", QWidget *parent = nullptr);
-    void setState(IndicatorWidget::IndicatorState setTo, QString from);
+    void setState(IndicatorWidget::IndicatorState setTo);
     QLabel *label;
 
 public slots:

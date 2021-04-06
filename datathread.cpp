@@ -40,7 +40,6 @@ double DataThread::sin_signal(double x, double ampl, double period)
 double DataThread::triangle_signal(double x, double ampl, double period)
 {
     double y = ampl/(M_PI) * asin(cos(2 * M_PI * x * 1.0/period));
-    qDebug()<<x<<y<<ampl<<period;
     return y;
 }
 
