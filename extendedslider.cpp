@@ -20,7 +20,7 @@ ExtendedSlider::ExtendedSlider(QString label_name, double def_min, double def_ma
     spinBox = new QDoubleSpinBox;
     spinBox->setMinimum(min);
     spinBox->setMaximum(max);
-    spinBox->setSingleStep((max-min)/100);
+    spinBox->setSingleStep((fabs(max) - fabs(min))/100);
 
     spinBox->setValue(value);
     updateValueFromSpinBox();

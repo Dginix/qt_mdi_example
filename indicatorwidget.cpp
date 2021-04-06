@@ -20,16 +20,14 @@ void IndicatorWidget::setState(IndicatorState setTo, QString from)
     switch(setTo)
     {
         case IndicatorState::OFF:
-            qDebug()<<myState<<" "<<from;
             myState = IndicatorState::OFF;
-            label -> setText(warningMessage);
+            label -> setText(normalMessage);
             label->setStyleSheet("background-color: green");
             break;
 
         case IndicatorState::ON:
-            qDebug()<<myState<<" "<<from;
             myState = IndicatorState::ON;
-            label -> setText(normalMessage);
+            label -> setText(warningMessage);
             label->setStyleSheet("background-color: red");
             break;
     }

@@ -60,13 +60,44 @@ MdiChild::~MdiChild()
 MdiChild::MdiChild(MdiChildType signalType, QWidget *parent) : QWidget(parent), mySignalType(signalType)
 {
     setAttribute(Qt::WA_DeleteOnClose);
+    mainLayout = new QVBoxLayout(this);
+    customPlot = new QCustomPlot(this);
+
+    customPlot->setObjectName(QString::fromUtf8("signal"));
+    customPlot->addGraph();
+    customPlot->graph(0)->setPen(QPen(Qt::black));
+
+    customPlot->axisRect()->setupFullAxesBox();
+    customPlot->yAxis->setRange(-1.2, 1.2);
+    customPlot->show();
+
+    line_item1 = new QCPItemLine(customPlot);
 
     switch(mySignalType)
     {
-        case MdiChildType::TriangleSignal:  this->setWindowTitle("TriangleSignal"); break;
-        case MdiChildType::SinSignal:       this->setWindowTitle("SinSignal"); break;
-        case MdiChildType::RandomSignal:    this->setWindowTitle("RandomSignal"); break;
-        case MdiChildType::OptionSignal:    this->setWindowTitle("OptionSignal"); break;
+        case MdiChildType::TriangleSignal:
+            //if low
+            this->setWindowTitle("TriangleSignal");
+            warnSlider1 = new ExtendedSlider("low tresh", 0, 5, 0);
+            mainLayout->addWidget(warnSlider1);
+            connect(warnSlider1, SIGNAL(mySignal(double)), this, SLOT(getValueWarnSlider1(double)));
+            break;
+
+        case MdiChildType::SinSignal:
+            this->setWindowTitle("SinSignal");
+            warnSlider1 = new ExtendedSlider("high tresh", 0, 5, 0);
+            mainLayout->addWidget(warnSlider1);
+            connect(warnSlider1, SIGNAL(mySignal(double)), this, SLOT(getValueWarnSlider1(double)));
+            break;
+
+        case MdiChildType::RandomSignal:
+            this->setWindowTitle("RandomSignal");
+            break;
+
+        case MdiChildType::OptionSignal:
+            this->setWindowTitle("OptionSignal");
+            break;
+
         case MdiChildType::MainWindow: break;
     }
 
@@ -74,10 +105,8 @@ MdiChild::MdiChild(MdiChildType signalType, QWidget *parent) : QWidget(parent), 
 
     x_data = 0;
     param1 = 1.0;
-    param2 = 2.0;
+    param2 = 1.0;
 
-    mainLayout = new QVBoxLayout(this);
-    customPlot = new QCustomPlot(this);
 
     if(mySignalType == MdiChildType::RandomSignal)
     {
@@ -92,108 +121,70 @@ MdiChild::MdiChild(MdiChildType signalType, QWidget *parent) : QWidget(parent), 
 
     indicator1 = new IndicatorWidget("Warning!", this);
 
-    label = new QLabel(this);
-    label->setText("bALBALB");
-
     mainLayout->addWidget(customPlot);
     mainLayout->addWidget(slider1);
     mainLayout->addWidget(slider2);
     mainLayout->addWidget(indicator1);
-    mainLayout->addWidget(label);
+
     setLayout(mainLayout);
 
-    customPlot->setObjectName(QString::fromUtf8("signal"));
-    customPlot->addGraph();
-    customPlot->graph(0)->setPen(QPen(Qt::red));
-    customPlot->show();
-
-    customPlot->axisRect()->setupFullAxesBox();
-    customPlot->yAxis->setRange(-1.2, 1.2);
+    workThread = new DataThread(mySignalType);
+    connect(workThread, SIGNAL(valueChanged(double,double)), this, SLOT(onDataChanged(double,double)));
+    connect(workThread, SIGNAL(finished()), workThread, SLOT(deleteLater()));
+    connect(this, SIGNAL(changeParam1(double)), workThread, SLOT(getParam1(double)));
+    connect(this, SIGNAL(changeParam2(double)), workThread, SLOT(getParam2(double)));
+    workThread->start();
 
     connect(slider1, SIGNAL(mySignal(double)), this, SLOT(getValueExtSlider1(double)));
     connect(slider2, SIGNAL(mySignal(double)), this, SLOT(getValueExtSlider2(double)));
-
-    // setup a timer that repeatedly calls MainWindow::realtimeDataSlot:
-    dataTimer = new QTimer(this);
-    dataTimer->setTimerType(Qt::PreciseTimer);
-    connect(dataTimer, SIGNAL(timeout()), this, SLOT(realtimeDataSlot()));
-    dataTimer->start(50); // Interval 0 means to refresh as fast as possible
-                          // in msec
-
-    DataThread *workThread = new DataThread();
-    connect(workThread, SIGNAL(valueChanged(double,double)), this, SLOT(onDataChanged(double,double)));
-    connect(workThread, SIGNAL(finished()), workThread, SLOT(deleteLater()));
-    workThread->start();
-}
-
-void MdiChild::realtimeDataSlot()
-{
-    // TODO depends from timer it mast be equal to 1 sec
-    double step = 0.005;
-    // TODO solve overflow problem
-    x_data += step;
-
-    switch(mySignalType)
-    {
-        case MdiChildType::TriangleSignal:  y_data = triangle_signal(x_data, param1, param2); break;
-        case MdiChildType::SinSignal:       y_data = sin_signal(x_data, param1, param2); break;
-        case MdiChildType::RandomSignal:    y_data = random_signal(param1, param2); break;
-        case MdiChildType::OptionSignal:    y_data = sin_signal(x_data, param1, param2); break;
-        case MdiChildType::MainWindow: break;
-    }
-
-    customPlot->graph(0)->addData(x_data, y_data);
-
-    customPlot->xAxis->setRange(x_data, step * 40, Qt::AlignRight);
-    customPlot->yAxis->setRange(-1, 10, Qt::AlignBottom);
-
-    customPlot->replot();
-}
-
-double MdiChild::sin_signal(double x, double ampl, double period)
-{
-    return ampl * sin(2 * M_PI * x * 1.0/period);
-}
-
-double MdiChild::triangle_signal(double x, double ampl, double period)
-{
-    //return 1.0 - fabs(fmod(x, 2.0) - 1.0);
-    return ampl/(M_PI) * asin(cos(2 * M_PI * x * 1.0/period));
-}
-
-double MdiChild::random_signal(double min, double max)
-{
-    double f = (double)rand() / RAND_MAX;
-    return min + f * (max - min);
 }
 
 void MdiChild::getValueExtSlider1(double slot_val)
 {
     param1 = slot_val;
+    emit changeParam1(param1);
 }
 
 void MdiChild::getValueExtSlider2(double slot_val)
 {
     param2 = slot_val;
+    emit changeParam1(param2);
+}
+
+void MdiChild::getValueWarnSlider1(double slot_val)
+{
+    warnVal1 = slot_val;
+}
+
+void MdiChild::getValueWarnSlider2(double slot_val)
+{
+    warnVal2 = slot_val;
 }
 
 void MdiChild::onDataChanged(double x, double y)
 {
-    static int abc = 0;
+    static double last_x = 0;
 
-    if(abc > 0)
+    x_data = x;
+    y_data = y;
+
+    customPlot->graph(0)->addData(x, y);
+    customPlot->xAxis->setRange(x, 10, Qt::AlignRight);
+    customPlot->yAxis->setRange(-1, 10, Qt::AlignBottom);
+
+    line_item1->setPen(QPen(Qt::red));
+
+    line_item1->start->setCoords(x - 11, warnVal1);
+    line_item1->end->setCoords(x + 11, warnVal1);
+
+    customPlot->replot();
+
+    if(y > warnVal1)
     {
-        label->setText(QString::number(x) + " " + QString::number(y));
-        label->setStyleSheet("background-color: red");
-        this->update();
-        abc = 0;
+        indicator1->setState(IndicatorWidget::IndicatorState::ON, windowTitle());
     }
     else
     {
-        label->setText(QString::number(x) + " " + QString::number(y));
-        label->setStyleSheet("background-color: green");
-        this->update();
-        abc = 1;
+        indicator1->setState(IndicatorWidget::IndicatorState::OFF, windowTitle());
     }
-
 }

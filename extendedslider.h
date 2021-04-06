@@ -5,6 +5,7 @@
 #include <QSlider>
 #include <QDoubleSpinBox>
 #include <QLabel>
+#include <math.h>
 
 class ExtendedSlider : public QWidget
 {

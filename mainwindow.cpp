@@ -11,10 +11,10 @@ MainWindow::MainWindow()
     mdiArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     setCentralWidget(mdiArea);
 
-    MdiChild *child = new MdiChild(MdiChildType::TriangleSignal);
+    MdiChild *child = new MdiChild(MdiChildType::SinSignal);
     mdiArea->addSubWindow(child);
 
-    MdiChild *child2 = new MdiChild(MdiChildType::SinSignal);
+    MdiChild *child2 = new MdiChild(MdiChildType::TriangleSignal);
     mdiArea->addSubWindow(child2);
 
 

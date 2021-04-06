@@ -66,20 +66,25 @@ public:
     explicit MdiChild(MdiChildType signalType = MdiChildType::TriangleSignal, QWidget *parent = nullptr);
     ~MdiChild();
 
-    double sin_signal(double x, double ampl, double period);
-    double triangle_signal(double x, double ampl, double period);
-    double random_signal(double min, double max);
-
 private:
     QCustomPlot *customPlot;
+    QCPItemLine *line_item1;
+
+
     QTimer *dataTimer;
     QVBoxLayout *mainLayout;
+
     ExtendedSlider *slider1;
     ExtendedSlider *slider2;
+
+    ExtendedSlider *warnSlider1;
+    ExtendedSlider *warnSlider2;
+
+
     IndicatorWidget *indicator1;
     MdiChildType mySignalType;
     QLabel *label;
-
+    DataThread *workThread;
 
 protected:
     double x_data;
@@ -88,17 +93,21 @@ protected:
     double param1;
     double param2;
 
+    double warnVal1;
+    double warnVal2;
 
 public slots:
     void onDataChanged(double,double);
 
 private slots:
-    void realtimeDataSlot();
-
     void getValueExtSlider1(double slot_val);
     void getValueExtSlider2(double slot_val);
+    void getValueWarnSlider1(double slot_val);
+    void getValueWarnSlider2(double slot_val);
 
-
+signals:
+    void changeParam1(double);
+    void changeParam2(double);
 };
 
 #endif
