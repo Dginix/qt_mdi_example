@@ -62,7 +62,7 @@ void MdiChild::closeEvent(QCloseEvent *e)
     e->ignore();
 }
 
-MdiChild::MdiChild(MdiChildType signalType, QWidget *parent) : QWidget(parent), mySignalType(signalType)
+MdiChild::MdiChild(MdiChildType signalType, QWidget *parent) : QMdiSubWindow(parent), mySignalType(signalType)
 {
     x_data = 0;
     y_data = 0;
@@ -71,8 +71,9 @@ MdiChild::MdiChild(MdiChildType signalType, QWidget *parent) : QWidget(parent), 
     param2 = 1.0;
     this->setMinimumSize(400, 600);
 
-    mainLayout = new QVBoxLayout(this);
-    customPlot = new QCustomPlot(this);
+    mainWidget = new QWidget(this);
+    mainLayout = new QVBoxLayout(mainWidget);
+    customPlot = new QCustomPlot(mainWidget);
 
     customPlot->setObjectName(QString::fromUtf8("signal"));
     customPlot->addGraph();
@@ -156,8 +157,6 @@ MdiChild::MdiChild(MdiChildType signalType, QWidget *parent) : QWidget(parent), 
     mainLayout->addWidget(slider1);
     mainLayout->addWidget(slider2);
 
-    setLayout(mainLayout);
-
     workThread = new DataThread(mySignalType);
     connect(workThread, SIGNAL(valueChanged(double,double)), this, SLOT(onDataChanged(double,double)));
     connect(workThread, SIGNAL(finished()), workThread, SLOT(deleteLater()));
@@ -167,6 +166,9 @@ MdiChild::MdiChild(MdiChildType signalType, QWidget *parent) : QWidget(parent), 
 
     connect(slider1, SIGNAL(mySignal(double)), this, SLOT(getValueExtSlider1(double)));
     connect(slider2, SIGNAL(mySignal(double)), this, SLOT(getValueExtSlider2(double)));
+
+    mainWidget->setLayout(mainLayout);
+    this->setWidget(mainWidget);
 }
 
 void MdiChild::getValueExtSlider1(double slot_val)
@@ -221,6 +223,8 @@ void MdiChild::warnTaskTriangle(void)
     if(y_data > warnVal1)
     {
         indicator1->setState(IndicatorWidget::IndicatorState::ON);
+        emit warningSignal(mySignalType);
+        emit testSignal();
     }
     else
     {
@@ -236,6 +240,8 @@ void MdiChild::warnTaskSin(void)
     if(y_data < warnVal1)
     {
         indicator1->setState(IndicatorWidget::IndicatorState::ON);
+        emit warningSignal(mySignalType);
+        emit testSignal();
     }
     else
     {
@@ -257,6 +263,8 @@ void MdiChild::warnTaskRandom(void)
     {
         wasHigh = true;
         indicator1->setState(IndicatorWidget::IndicatorState::ON);
+        emit warningSignal(mySignalType);
+        emit testSignal();
     }
     else if(wasHigh && y_data < warnVal2)
     {

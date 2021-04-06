@@ -21,16 +21,19 @@ void MainWindow::createMdi()
     mdiArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     setCentralWidget(mdiArea);
 
-    child1 = new MdiChild(MdiChildType::TriangleSignal);
-    mdiArea->addSubWindow(child1);
+    TriangleSignal = new MdiChild(MdiChildType::TriangleSignal);
+    connect(TriangleSignal, &MdiChild::warningSignal, this, &MainWindow::onWarningSignal);
+    mdiArea->addSubWindow(TriangleSignal);
 
-    child2 = new MdiChild(MdiChildType::SinSignal);
-    mdiArea->addSubWindow(child2);
+    SinSignal = new MdiChild(MdiChildType::SinSignal);
+    connect(SinSignal, &MdiChild::warningSignal, this, &MainWindow::onWarningSignal);
+    mdiArea->addSubWindow(SinSignal);
 
-    child3 = new MdiChild(MdiChildType::RandomSignal);
-    mdiArea->addSubWindow(child3);
+    RandomSignal = new MdiChild(MdiChildType::RandomSignal);
+    connect(RandomSignal, &MdiChild::warningSignal, this, &MainWindow::onWarningSignal);
+    mdiArea->addSubWindow(RandomSignal);
 
-    mainMdiChild = new MainMdiChild(child1, child2, child3);
+    mainMdiChild = new MainMdiChild(TriangleSignal, SinSignal, RandomSignal);
     mdiArea->addSubWindow(mainMdiChild);
 }
 
@@ -51,4 +54,34 @@ void MainWindow::createMenu()
     MainMenu->addMenu(setSignal);
 }
 
+void MainWindow::onWarningSignal(MdiChildType fromChild)
+{
+    switch(fromChild)
+    {
+        case MdiChildType::SinSignal:   // 1
+            mdiArea->setActiveSubWindow(SinSignal);
+            SinSignal->setWindowState(SinSignal->windowState() & ~Qt::WindowMinimized);
+            break;
+
+        case MdiChildType::TriangleSignal:    // 2
+            mdiArea->setActiveSubWindow(TriangleSignal);
+            TriangleSignal->setWindowState(TriangleSignal->windowState() & ~Qt::WindowMinimized);
+            break;
+
+        case MdiChildType::OptionSignal:     // 4
+//            mdiArea->setActiveSubWindow(OptionSignal);
+//            OptionSignal->setWindowState(OptionSignal->windowState() & ~Qt::WindowMinimized);
+            break;
+
+        case MdiChildType::RandomSignal:    // 3
+            mdiArea->setActiveSubWindow(RandomSignal);
+            RandomSignal->setWindowState(RandomSignal->windowState() & ~Qt::WindowMinimized);
+            break;
+    }
+}
+
+void MainWindow::testSlot()
+{
+    qDebug()<<"bla";
+}
 

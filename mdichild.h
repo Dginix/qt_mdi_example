@@ -57,8 +57,9 @@
 #include "indicatorwidget.h"
 #include "datathread.h"
 #include <QLabel>
+#include <QWidget>
 
-class MdiChild : public QWidget
+class MdiChild : public QMdiSubWindow
 {
     Q_OBJECT
 
@@ -72,6 +73,8 @@ public:
     ~MdiChild();
 
 private:
+    QWidget *mainWidget;
+
     QCustomPlot *customPlot;
     QCPItemLine *line_item1;
     QCPItemLine *line_item2;
@@ -116,6 +119,8 @@ private slots:
 signals:
     void changeParam1(double);
     void changeParam2(double);
+    void warningSignal(MdiChildType childType);
+    void testSignal();
 };
 
 #endif

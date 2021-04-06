@@ -10,7 +10,7 @@ class MainMdiChild : public QWidget
 
 public:
     MdiChildType switchSignal;
-    explicit MainMdiChild(MdiChild *win1, MdiChild *win2, MdiChild *win3, QWidget *parent = nullptr);
+    explicit MainMdiChild(MdiChild *TriangleSignal, MdiChild *SinSignal, MdiChild *RandomSignal, QWidget *parent = nullptr);
     ~MainMdiChild();
 
 private:

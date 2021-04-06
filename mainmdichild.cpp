@@ -11,8 +11,8 @@ void MainMdiChild::closeEvent(QCloseEvent *e)
     e->ignore();
 }
 
-MainMdiChild::MainMdiChild(MdiChild *win1, MdiChild *win2, MdiChild *win3, QWidget *parent) : QWidget(parent),
-    winPointer1(win1), winPointer2(win2), winPointer3(win3)
+MainMdiChild::MainMdiChild(MdiChild *TriangleSignal, MdiChild *SinSignal, MdiChild *RandomSignal, QWidget *parent) : QWidget(parent),
+    winPointer1(TriangleSignal), winPointer2(SinSignal), winPointer3(RandomSignal)
 {
     this->setMinimumSize(400, 600);
     this->setWindowTitle("Main Window");
@@ -96,7 +96,6 @@ void MainMdiChild::setSwitchSin()
 
 void MainMdiChild::setSwitchRandom()
 {
-    qDebug()<<"call random";
     switchSignal = MdiChildType::RandomSignal;
 }
 

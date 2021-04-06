@@ -32,15 +32,19 @@ private:
     QAction *action1;
     QAction *action2;
 
-    MdiChild *child1;
-    MdiChild *child2;
-    MdiChild *child3;
-    MdiChild *child4;
+    MdiChild *TriangleSignal;
+    MdiChild *SinSignal;
+    MdiChild *RandomSignal;
+    MdiChild *OptionSignal;
 
     MainMdiChild *mainMdiChild;
 
     void createMenu();
     void createMdi();
+
+public slots:
+    void onWarningSignal(MdiChildType fromChild);
+    void testSlot();
 
 };
 #endif // MAINWINDOW_H
