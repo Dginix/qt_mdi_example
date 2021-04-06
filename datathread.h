@@ -17,6 +17,7 @@ public:
     double sin_signal(double x, double ampl, double period);
     double triangle_signal(double x, double ampl, double period);
     double random_signal(double min, double max);
+    double option_signal(double x, double ampl, double period);
 
 signals:
     void valueChanged(double, double);

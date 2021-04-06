@@ -7,6 +7,7 @@
 #include "mdichildtype.h"
 #include "mainmdichild.h"
 #include <functional>
+#include "processmdichild.h"
 
 QT_BEGIN_NAMESPACE
 class QAction;
@@ -32,8 +33,12 @@ private:
     QMenu *MainMenu;
     QMenu *setActiveWindow;
     QMenu *setSignal;
-    QAction *action1;
-    QAction *action2;
+
+    QMenu *autoActivMenu;
+    QAction *autoSine;
+    QAction *autoTriangle;
+    QAction *autoRandom;
+    QAction *autoOption;
 
     MdiChild *TriangleSignal;
     MdiChild *SinSignal;
@@ -41,6 +46,9 @@ private:
     MdiChild *OptionSignal;
 
     MainMdiChild *mainMdiChild;
+
+    ProcessMdiChild *processMdiChild;
+
 
     void createMenu();
     void createMdi();

@@ -14,6 +14,7 @@ SOURCES += \
     main.cpp \
     mainmdichild.cpp \
     mainwindow.cpp \
+    processmdichild.cpp \
     qcustomplot.cpp \
     mdichild.cpp \
     extendedslider.cpp
@@ -24,6 +25,7 @@ HEADERS += \
     mainmdichild.h \
     mainwindow.h \
     mdichildtype.h \
+    processmdichild.h \
     qcustomplot.h \
     mdichild.h \
     extendedslider.h

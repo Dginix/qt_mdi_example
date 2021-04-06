@@ -11,8 +11,8 @@ void MainMdiChild::closeEvent(QCloseEvent *e)
     e->ignore();
 }
 
-MainMdiChild::MainMdiChild(MdiChild *TriangleSignal, MdiChild *SinSignal, MdiChild *RandomSignal, QWidget *parent) : QWidget(parent),
-    winPointer1(TriangleSignal), winPointer2(SinSignal), winPointer3(RandomSignal)
+MainMdiChild::MainMdiChild(MdiChild *TriangleSignal, MdiChild *SinSignal, MdiChild *RandomSignal, MdiChild *OptionSignal, QWidget *parent) : QWidget(parent),
+    winPointer1(TriangleSignal), winPointer2(SinSignal), winPointer3(RandomSignal), winPointer4(OptionSignal)
 {
     this->setMinimumSize(400, 600);
     this->setWindowTitle("Main Window");
@@ -60,6 +60,7 @@ void MainMdiChild::realtimeDataSlot()
     customPlotMain->graph(0)->addData(winPointer1->x_data, winPointer1->y_data);
     customPlotMain->graph(1)->addData(winPointer2->x_data, winPointer2->y_data);
     customPlotMain->graph(2)->addData(winPointer3->x_data, winPointer3->y_data);
+    customPlotMain->graph(3)->addData(winPointer4->x_data, winPointer4->y_data);
 
     customPlotMain->xAxis->setRange(winPointer3->x_data, 10, Qt::AlignRight);
     customPlotMain->yAxis->setRange(-1, 10, Qt::AlignBottom);
@@ -72,7 +73,7 @@ void MainMdiChild::realtimeDataSlot()
         case MdiChildType::TriangleSignal:  x_switch = winPointer1->x_data; y_switch = winPointer1->y_data; break;
         case MdiChildType::SinSignal:       x_switch = winPointer2->x_data; y_switch = winPointer2->y_data; break;
         case MdiChildType::RandomSignal:    x_switch = winPointer3->x_data; y_switch = winPointer3->y_data; break;
-        case MdiChildType::OptionSignal: break;
+        case MdiChildType::OptionSignal:    x_switch = winPointer4->x_data; y_switch = winPointer4->y_data; break;;
     }
 
     customPlotSwitch->graph(0)->addData(x_switch, y_switch);

@@ -33,8 +33,16 @@ void MainWindow::createMdi()
     connect(RandomSignal, &MdiChild::warningSignal, this, &MainWindow::onWarningSignal);
     mdiArea->addSubWindow(RandomSignal);
 
-    mainMdiChild = new MainMdiChild(TriangleSignal, SinSignal, RandomSignal);
+    OptionSignal = new MdiChild(MdiChildType::OptionSignal);
+    connect(OptionSignal, &MdiChild::warningSignal, this, &MainWindow::onWarningSignal);
+    mdiArea->addSubWindow(OptionSignal);
+
+    mainMdiChild = new MainMdiChild(TriangleSignal, SinSignal, RandomSignal, OptionSignal);
     mdiArea->addSubWindow(mainMdiChild);
+
+    processMdiChild = new ProcessMdiChild(this);
+    mdiArea->addSubWindow(processMdiChild);
+    processMdiChild->setSignal(SinSignal);
 }
 
 void MainWindow::createMenu()
@@ -70,7 +78,28 @@ void MainWindow::createMenu()
     connect(optopn_activ, &QAction::triggered,
             [=]() { this->myActivateWindow(MdiChildType::OptionSignal); });
 
+
+    autoActivMenu = new QMenu("Set auto activation", this);
+
+    autoSine = new QAction("Auto warning sine signal", this);
+    autoSine->setCheckable(true);
+
+    autoTriangle = new QAction("Auto warning triangle signal", this);
+    autoTriangle->setCheckable(true);
+
+    autoRandom = new QAction("Auto warning random signal", this);
+    autoRandom->setCheckable(true);
+
+    autoOption = new QAction("Auto warning option signal", this);
+    autoOption->setCheckable(true);
+
+    autoActivMenu->addAction(autoSine);
+    autoActivMenu->addAction(autoTriangle);
+    autoActivMenu->addAction(autoRandom);
+    autoActivMenu->addAction(autoOption);
+
     MainMenu->addMenu(setActiveWindow);
+    MainMenu->addMenu(autoActivMenu);
     MainMenu->addMenu(setSignal);
 }
 
@@ -89,8 +118,8 @@ void MainWindow::myActivateWindow(MdiChildType childType)
             break;
 
         case MdiChildType::OptionSignal:     // 4
-//            mdiArea->setActiveSubWindow(OptionSignal);
-//            OptionSignal->setWindowState(OptionSignal->windowState() & ~Qt::WindowMinimized);
+            mdiArea->setActiveSubWindow(OptionSignal);
+            OptionSignal->setWindowState(OptionSignal->windowState() & ~Qt::WindowMinimized);
             break;
 
         case MdiChildType::RandomSignal:    // 3
@@ -108,16 +137,16 @@ void MainWindow::onWarningSignal(MdiChildType slotChildType, bool warnState)
     static bool blockWarn4 = false;
 
     if(slotChildType == MdiChildType::SinSignal && warnState) blockWarn1 = true;
-    if(slotChildType == MdiChildType::SinSignal && !warnState) blockWarn1 = false;
+    if((slotChildType == MdiChildType::SinSignal && !warnState) || !autoSine->isChecked()) blockWarn1 = false;
 
     if(slotChildType == MdiChildType::TriangleSignal && warnState) blockWarn2 = true;
-    if(slotChildType == MdiChildType::TriangleSignal && !warnState) blockWarn2 = false;
+    if((slotChildType == MdiChildType::TriangleSignal && !warnState) || !autoTriangle->isChecked()) blockWarn2 = false;
 
     if(slotChildType == MdiChildType::RandomSignal && warnState) blockWarn3 = true;
-    if(slotChildType == MdiChildType::RandomSignal && !warnState) blockWarn3 = false;
+    if((slotChildType == MdiChildType::RandomSignal && !warnState) || !autoRandom->isChecked()) blockWarn3 = false;
 
     if(slotChildType == MdiChildType::OptionSignal && warnState) blockWarn4 = true;
-    if(slotChildType == MdiChildType::OptionSignal && !warnState) blockWarn4 = false;
+    if((slotChildType == MdiChildType::OptionSignal && !warnState) || !autoOption->isChecked()) blockWarn4 = false;
 
     if(blockWarn1)
     {

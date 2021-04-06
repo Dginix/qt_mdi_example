@@ -138,18 +138,41 @@ MdiChild::MdiChild(MdiChildType signalType, QWidget *parent) : QMdiSubWindow(par
 
         case MdiChildType::OptionSignal:
             this->setWindowTitle("OptionSignal");
+
+            warnSlider1 = new ExtendedSlider("high tresh", -5, 5, 4);
+            warnVal1 = 4;
+            mainLayout->addWidget(warnSlider1);
+            connect(warnSlider1, SIGNAL(mySignal(double)), this, SLOT(getValueWarnSlider1(double)));
+
+            warnSlider2 = new ExtendedSlider("low tresh", -5, 5, -4);
+            warnVal2 = -4;
+            mainLayout->addWidget(warnSlider2);
+            connect(warnSlider2, SIGNAL(mySignal(double)), this, SLOT(getValueWarnSlider2(double)));
+
+            indicator1 = new IndicatorWidget("Too high!", this);
+            mainLayout->addWidget(indicator1);
+
+            indicator2 = new IndicatorWidget("Too low!", this);
+            mainLayout->addWidget(indicator2);
+
+            line_item1 = new QCPItemLine(customPlot);
+            line_item1->setPen(QPen(Qt::red));
+
+            line_item2 = new QCPItemLine(customPlot);
+            line_item2->setPen(QPen(Qt::green));
+
             break;
     }
 
     if(mySignalType == MdiChildType::RandomSignal)
     {
-        slider1 = new ExtendedSlider("min", 0, 5, 1);
-        slider2 = new ExtendedSlider("max", 0, 5, 1);
+        slider1 = new ExtendedSlider("min", 0, 5, 1, this);
+        slider2 = new ExtendedSlider("max", 0, 5, 1, this);
     }
     else
     {
-        slider1 = new ExtendedSlider("amplitude", 0, 5, 1);
-        slider2 = new ExtendedSlider("period", 0, 5, 1);
+        slider1 = new ExtendedSlider("amplitude", 0, 5, 1, this);
+        slider2 = new ExtendedSlider("period", 0, 5, 1, this);
     }
 
 
@@ -160,8 +183,10 @@ MdiChild::MdiChild(MdiChildType signalType, QWidget *parent) : QMdiSubWindow(par
     workThread = new DataThread(mySignalType);
     connect(workThread, SIGNAL(valueChanged(double,double)), this, SLOT(onDataChanged(double,double)));
     connect(workThread, SIGNAL(finished()), workThread, SLOT(deleteLater()));
+
     connect(this, SIGNAL(changeParam1(double)), workThread, SLOT(getParam1(double)));
     connect(this, SIGNAL(changeParam2(double)), workThread, SLOT(getParam2(double)));
+
     workThread->start();
 
     connect(slider1, SIGNAL(mySignal(double)), this, SLOT(getValueExtSlider1(double)));
@@ -180,7 +205,7 @@ void MdiChild::getValueExtSlider1(double slot_val)
 void MdiChild::getValueExtSlider2(double slot_val)
 {
     param2 = slot_val;
-    emit changeParam1(param2);
+    emit changeParam2(param2);
 }
 
 void MdiChild::getValueWarnSlider1(double slot_val)
@@ -192,8 +217,6 @@ void MdiChild::getValueWarnSlider2(double slot_val)
 {
     warnVal2 = slot_val;
 }
-
-
 
 void MdiChild::onDataChanged(double x, double y)
 {
@@ -210,7 +233,7 @@ void MdiChild::onDataChanged(double x, double y)
         case MdiChildType::TriangleSignal:  warnTaskTriangle(); break;
         case MdiChildType::SinSignal:       warnTaskSin(); break;
         case MdiChildType::RandomSignal:    warnTaskRandom(); break;
-        case MdiChildType::OptionSignal:    break;
+    case MdiChildType::OptionSignal:    warnTaskOptional(); break;
     }
     customPlot->replot();
 }
@@ -272,3 +295,36 @@ void MdiChild::warnTaskRandom(void)
         emit warningSignal(mySignalType, false);
     }
 }
+
+void MdiChild::warnTaskOptional(void)
+{
+    line_item1->start->setCoords(x_data - 11, warnVal1);
+    line_item1->end->setCoords(x_data + 11, warnVal1);
+
+    line_item2->start->setCoords(x_data - 11, warnVal2);
+    line_item2->end->setCoords(x_data + 11, warnVal2);
+
+    if(y_data > warnVal1)
+    {
+        indicator1->setState(IndicatorWidget::IndicatorState::ON);
+        emit warningSignal(mySignalType, true);
+    }
+    else
+    {
+        indicator1->setState(IndicatorWidget::IndicatorState::OFF);
+        emit warningSignal(mySignalType, false);
+    }
+
+    if(y_data < warnVal2)
+    {
+        indicator2->setState(IndicatorWidget::IndicatorState::ON);
+        emit warningSignal(mySignalType, true);
+    }
+    else
+    {
+        indicator2->setState(IndicatorWidget::IndicatorState::OFF);
+        emit warningSignal(mySignalType, false);
+    }
+
+}
+

@@ -5,31 +5,30 @@
 ExtendedSlider::ExtendedSlider(QString label_name, double def_min, double def_max,
                                double def_val, QWidget *parent) : QWidget(parent)
 {
-    sliderCoeff = 1000;
-    extSliderStep = (max - min)/100;
-
     min = def_min;
     max = def_max;
     value = def_val;
+
+    sliderCoeff = 1000;
+    extSliderStep = (max - min)/100.0;
 
     label = new QLabel(this);
     label->setText(label_name);
     label->setAlignment(Qt::AlignCenter);
 
-    slider = new QSlider(Qt::Horizontal);
+    slider = new QSlider(Qt::Horizontal, this);
     slider->setMinimum(min * sliderCoeff);
     slider->setMaximum(max * sliderCoeff);
     slider->setSingleStep(extSliderStep * sliderCoeff);
 
-    spinBox = new QDoubleSpinBox;
+    spinBox = new QDoubleSpinBox(this);
     spinBox->setMinimum(min);
     spinBox->setMaximum(max);
     spinBox->setSingleStep(extSliderStep);
-
     spinBox->setValue(value);
     updateValueFromSpinBox();
 
-    QHBoxLayout *mainLayout = new QHBoxLayout;
+    QHBoxLayout *mainLayout = new QHBoxLayout(this);
     mainLayout->addWidget(label);
     mainLayout->addWidget(spinBox);
     mainLayout->addWidget(slider);

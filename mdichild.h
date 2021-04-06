@@ -113,12 +113,14 @@ public slots:
 private slots:
     void getValueExtSlider1(double slot_val);
     void getValueExtSlider2(double slot_val);
+
     void getValueWarnSlider1(double slot_val);
     void getValueWarnSlider2(double slot_val);
 
 signals:
     void changeParam1(double);
     void changeParam2(double);
+
     void warningSignal(MdiChildType, bool);
 };
 
