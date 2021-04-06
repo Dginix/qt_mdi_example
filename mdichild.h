@@ -62,6 +62,15 @@ class MdiChild : public QWidget
 {
     Q_OBJECT
 
+public:
+    MdiChildType mySignalType;
+
+    double x_data;
+    double y_data;
+
+    explicit MdiChild(MdiChildType signalType = MdiChildType::TriangleSignal, QWidget *parent = nullptr);
+    ~MdiChild();
+
 private:
     QCustomPlot *customPlot;
     QCPItemLine *line_item1;
@@ -78,30 +87,22 @@ private:
     IndicatorWidget *indicator1;
     IndicatorWidget *indicator2;
 
-    MdiChildType mySignalType;
     QLabel *label;
     DataThread *workThread;
 
-protected:
-    double x_data;
-    double y_data;
+    void warnTaskTriangle(void);
+    void warnTaskSin(void);
+    void warnTaskRandom(void);
+    void warnTaskOptional(void);
 
+protected:
     double param1;
     double param2;
 
     double warnVal1;
     double warnVal2;
 
-public:
-    explicit MdiChild(MdiChildType signalType = MdiChildType::TriangleSignal, QWidget *parent = nullptr);
-    ~MdiChild();
-
-private:
-    void warnTaskTriangle(void);
-    void warnTaskSin(void);
-    void warnTaskRandom(void);
-    void warnTaskOptional(void);
-
+    void closeEvent(QCloseEvent *e);
 
 public slots:
     void onDataChanged(double,double);

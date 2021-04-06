@@ -12,6 +12,7 @@ SOURCES += \
     datathread.cpp \
     indicatorwidget.cpp \
     main.cpp \
+    mainmdichild.cpp \
     mainwindow.cpp \
     qcustomplot.cpp \
     mdichild.cpp \
@@ -20,6 +21,7 @@ SOURCES += \
 HEADERS += \
     datathread.h \
     indicatorwidget.h \
+    mainmdichild.h \
     mainwindow.h \
     mdichildtype.h \
     qcustomplot.h \

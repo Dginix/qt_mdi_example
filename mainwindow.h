@@ -5,6 +5,7 @@
 #include <QTimer>
 #include "mdichild.h"
 #include "mdichildtype.h"
+#include "mainmdichild.h"
 
 QT_BEGIN_NAMESPACE
 class QAction;
@@ -25,11 +26,21 @@ public:
 private:
     QMdiArea *mdiArea;
 
-    QMenu *windowMenu;
-    QAction *do_smth_1;
-    QAction *do_smth_2;
+    QMenu *MainMenu;
+    QMenu *setActiveWindow;
+    QMenu *setSignal;
+    QAction *action1;
+    QAction *action2;
 
-    MdiChild *createMdiChild();
+    MdiChild *child1;
+    MdiChild *child2;
+    MdiChild *child3;
+    MdiChild *child4;
+
+    MainMdiChild *mainMdiChild;
+
+    void createMenu();
+    void createMdi();
 
 };
 #endif // MAINWINDOW_H

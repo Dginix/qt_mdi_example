@@ -1,40 +1,54 @@
 #include "mainwindow.h"
-#include "mainwindow.h"
 #include "qcustomplot.h"
 #include <QtDebug>
 #include <QThread>
 
+MainWindow::~MainWindow()
+{
+
+}
+
 MainWindow::MainWindow()
     : mdiArea(new QMdiArea)
+{
+    createMdi();
+    createMenu();
+}
+
+void MainWindow::createMdi()
 {
     mdiArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     mdiArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     setCentralWidget(mdiArea);
 
-    MdiChild *child = new MdiChild(MdiChildType::SinSignal);
-    mdiArea->addSubWindow(child);
+    child1 = new MdiChild(MdiChildType::TriangleSignal);
+    mdiArea->addSubWindow(child1);
 
-    MdiChild *child2 = new MdiChild(MdiChildType::TriangleSignal);
+    child2 = new MdiChild(MdiChildType::SinSignal);
     mdiArea->addSubWindow(child2);
 
-    MdiChild *child3 = new MdiChild(MdiChildType::RandomSignal);
+    child3 = new MdiChild(MdiChildType::RandomSignal);
     mdiArea->addSubWindow(child3);
 
-    do_smth_1 = new QAction(tr("&do_smth_1"), this);
-    do_smth_1->setShortcuts(QKeySequence::New);
-    do_smth_1->setStatusTip(tr("Create a new file"));
-
-    windowMenu = menuBar()->addMenu(tr("&SCADA"));
-    windowMenu->addAction(do_smth_1);
+    mainMdiChild = new MainMdiChild(child1, child2, child3);
+    mdiArea->addSubWindow(mainMdiChild);
 }
 
-MainWindow::~MainWindow()
+void MainWindow::createMenu()
 {
+    MainMenu = menuBar()->addMenu("SCADA");
+
+    setSignal = new QMenu("Switch signal");
+
+    setSignal->addAction("Triangle signal", mainMdiChild, SLOT(setSwitchTriangle()));
+    setSignal->addAction("Sine signal", mainMdiChild, SLOT(setSwitchSin()));
+    setSignal->addAction("Random signal", mainMdiChild, SLOT(setSwitchRandom()));
+    setSignal->addAction("OPtion signal", mainMdiChild, SLOT(setSwitchOption()));
+
+    setActiveWindow = new QMenu("Activate window");
+
+    MainMenu->addMenu(setActiveWindow);
+    MainMenu->addMenu(setSignal);
 }
 
-MdiChild *MainWindow::createMdiChild()
-{
-    MdiChild *child = new MdiChild;
-    mdiArea->addSubWindow(child);
-    return child;
-}
+

@@ -24,7 +24,6 @@ void DataThread::run()
             case MdiChildType::SinSignal:       y = sin_signal(x, param1, param2); break;
             case MdiChildType::RandomSignal:    y = random_signal(param1, param2); break;
             case MdiChildType::OptionSignal:    y = sin_signal(x, param1, param2); break;
-            case MdiChildType::MainWindow: break;
         }
 
         emit valueChanged(x, y);

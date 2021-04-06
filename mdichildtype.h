@@ -7,7 +7,6 @@ enum class MdiChildType
     TriangleSignal,
     RandomSignal,
     OptionSignal,
-    MainWindow
 };
 
 #endif // MDICHILDTYPE_H

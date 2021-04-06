@@ -57,6 +57,11 @@ MdiChild::~MdiChild()
     delete customPlot;
 }
 
+void MdiChild::closeEvent(QCloseEvent *e)
+{
+    e->ignore();
+}
+
 MdiChild::MdiChild(MdiChildType signalType, QWidget *parent) : QWidget(parent), mySignalType(signalType)
 {
     x_data = 0;
@@ -64,8 +69,7 @@ MdiChild::MdiChild(MdiChildType signalType, QWidget *parent) : QWidget(parent), 
 
     param1 = 1.0;
     param2 = 1.0;
-    setAttribute(Qt::WA_DeleteOnClose);
-    this->setMinimumSize(300, 150);
+    this->setMinimumSize(400, 600);
 
     mainLayout = new QVBoxLayout(this);
     customPlot = new QCustomPlot(this);
@@ -134,8 +138,6 @@ MdiChild::MdiChild(MdiChildType signalType, QWidget *parent) : QWidget(parent), 
         case MdiChildType::OptionSignal:
             this->setWindowTitle("OptionSignal");
             break;
-
-        case MdiChildType::MainWindow: break;
     }
 
     if(mySignalType == MdiChildType::RandomSignal)
@@ -207,7 +209,6 @@ void MdiChild::onDataChanged(double x, double y)
         case MdiChildType::SinSignal:       warnTaskSin(); break;
         case MdiChildType::RandomSignal:    warnTaskRandom(); break;
         case MdiChildType::OptionSignal:    break;
-        case MdiChildType::MainWindow: break;
     }
     customPlot->replot();
 }
