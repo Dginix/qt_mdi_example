@@ -58,26 +58,25 @@ void MainWindow::createMenu()
 
     setActiveWindow = new QMenu("Activate window");
 
-    QAction *triangle_activ = new QAction("Triangle signal", this);
-    setActiveWindow->addAction(triangle_activ);
-    connect(triangle_activ, &QAction::triggered,
+    triangleActiv = new QAction("Triangle signal", this);
+    setActiveWindow->addAction(triangleActiv);
+    connect(triangleActiv, &QAction::triggered,
             [=]() { this->myActivateWindow(MdiChildType::TriangleSignal); });
 
-    QAction *sin_activ = new QAction("Sine signal", this);
-    setActiveWindow->addAction(sin_activ);
-    connect(sin_activ, &QAction::triggered,
+    sinActiv = new QAction("Sine signal", this);
+    setActiveWindow->addAction(sinActiv);
+    connect(sinActiv, &QAction::triggered,
             [=]() { this->myActivateWindow(MdiChildType::SinSignal); });
 
-    QAction *rand_activ = new QAction("Random signal", this);
-    setActiveWindow->addAction(rand_activ);
-    connect(rand_activ, &QAction::triggered,
+    randActiv = new QAction("Random signal", this);
+    setActiveWindow->addAction(randActiv);
+    connect(randActiv, &QAction::triggered,
             [=]() { this->myActivateWindow(MdiChildType::RandomSignal); });
 
-    QAction *optopn_activ = new QAction("Option signal", this);
-    setActiveWindow->addAction(optopn_activ);
-    connect(optopn_activ, &QAction::triggered,
+    optopnActiv = new QAction("Option signal", this);
+    setActiveWindow->addAction(optopnActiv);
+    connect(optopnActiv, &QAction::triggered,
             [=]() { this->myActivateWindow(MdiChildType::OptionSignal); });
-
 
     autoActivMenu = new QMenu("Set auto activation", this);
 
@@ -98,6 +97,38 @@ void MainWindow::createMenu()
     autoActivMenu->addAction(autoRandom);
     autoActivMenu->addAction(autoOption);
 
+
+    processMenu = new QMenu("Signal processing", this);
+
+    processSine = new QAction("Sine signal", this);
+    processMenu->addAction(processSine);
+    connect(processSine, &QAction::triggered,
+            [=]() {
+        processMdiChild->setSignal(SinSignal);
+    });
+
+    processTriangle = new QAction("Triangle signal", this);
+    processMenu->addAction(processTriangle);
+    connect(processTriangle, &QAction::triggered,
+            [=]() {
+        processMdiChild->setSignal(TriangleSignal);
+    });
+
+    processRandom = new QAction("Random signal", this);
+    processMenu->addAction(processRandom);
+    connect(processRandom, &QAction::triggered,
+            [=]() {
+        processMdiChild->setSignal(RandomSignal);
+    });
+
+    processOption = new QAction("Option signal", this);
+    processMenu->addAction(processOption);
+    connect(processOption, &QAction::triggered,
+            [=]() {
+        processMdiChild->setSignal(OptionSignal);
+    });
+
+    MainMenu->addMenu(processMenu);
     MainMenu->addMenu(setActiveWindow);
     MainMenu->addMenu(autoActivMenu);
     MainMenu->addMenu(setSignal);

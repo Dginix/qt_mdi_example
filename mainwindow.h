@@ -31,8 +31,12 @@ private:
     QMdiArea *mdiArea;
 
     QMenu *MainMenu;
-    QMenu *setActiveWindow;
-    QMenu *setSignal;
+
+    QMenu *processMenu;
+    QAction *processSine;
+    QAction *processTriangle;
+    QAction *processRandom;
+    QAction *processOption;
 
     QMenu *autoActivMenu;
     QAction *autoSine;
@@ -40,6 +44,13 @@ private:
     QAction *autoRandom;
     QAction *autoOption;
 
+    QMenu *setActiveWindow;
+    QAction *triangleActiv;
+    QAction *sinActiv;
+    QAction *randActiv;
+    QAction *optopnActiv;
+
+    QMenu *setSignal;
     MdiChild *TriangleSignal;
     MdiChild *SinSignal;
     MdiChild *RandomSignal;

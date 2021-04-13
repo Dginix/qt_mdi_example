@@ -15,6 +15,9 @@ ProcessMdiChild::ProcessMdiChild(QWidget *parent) : QMdiSubWindow(parent)
     inter_count = 0;
     param1 = 5;
 
+    this->setMinimumSize(400, 600);
+    this->setWindowTitle("Process signal window");
+
     mainWidget = new QWidget(this);
     mainLayout = new QVBoxLayout(mainWidget);
     customPlot = new QCustomPlot(mainWidget);
@@ -47,7 +50,7 @@ ProcessMdiChild::ProcessMdiChild(QWidget *parent) : QMdiSubWindow(parent)
 
 void ProcessMdiChild::setSignal(MdiChild *f_signalToProcess)
 {
-    inter_count = param1;
+    inter_count = 0;
     signalToProcess = f_signalToProcess;
 }
 
@@ -69,7 +72,7 @@ void ProcessMdiChild::realtimeDataSlot()
     }
 
     customPlot->xAxis->setRange(signalToProcess->x_data, 10, Qt::AlignRight);
-    customPlot->yAxis->setRange(-1, 10, Qt::AlignBottom);
+    customPlot->yAxis->setRange(0, 3, Qt::AlignBottom);
 
     customPlot->replot();
 }

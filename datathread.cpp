@@ -51,6 +51,7 @@ double DataThread::option_signal(double x, double ampl, double period)
 {
     double y;
     static double add = 0;
+    period *= 4;
     double freq = 1.0 / period;
 
     if(x - add >= period/4.0)
